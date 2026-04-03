@@ -1,9 +1,18 @@
 import { useEffect } from "react";
 
-export const RockList = ({ rocks, fetchRocks }) => {
+export const RockList = ({ rocks, fetchRocks, mine }) => {
   useEffect(() => {
     fetchRocks();
-  }, []);
+  }, [mine]);
+
+  const deleteRock = (id) => {
+    fetch(`http://localhost:8000/rocks/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Token ${JSON.parse(localStorage.getItem("rock_token")).token}`,
+      },
+    }).then(() => fetchRocks());
+  };
 
   const displayRocks = () => {
     if (rocks && rocks.length) {
@@ -15,6 +24,18 @@ export const RockList = ({ rocks, fetchRocks }) => {
           {rock.name} ({rock.type.label}) weighs {rock.weight} kg
           <br />
           In collection of {rock.user.first_name} {rock.user.last_name}
+          <br />
+          {mine ? (
+            <button
+              type="delete"
+              onClick={() => deleteRock(rock.id)}
+              className="button rounded-md bg-red-700 text-blue-100 p-2 mt-4"
+            >
+              Delete
+            </button>
+          ) : (
+            <></>
+          )}
         </div>
       ));
     }
